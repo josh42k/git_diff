@@ -1,0 +1,6 @@
+C:\Users\JoshK\source\repos\git_diff\git_diff\bin\Debug\git_diff.exe.config
+C:\Users\JoshK\source\repos\git_diff\git_diff\bin\Debug\git_diff.exe
+C:\Users\JoshK\source\repos\git_diff\git_diff\bin\Debug\git_diff.pdb
+C:\Users\JoshK\source\repos\git_diff\git_diff\obj\Debug\git_diff.csprojAssemblyReference.cache
+C:\Users\JoshK\source\repos\git_diff\git_diff\obj\Debug\git_diff.exe
+C:\Users\JoshK\source\repos\git_diff\git_diff\obj\Debug\git_diff.pdb
