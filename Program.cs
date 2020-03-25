@@ -47,7 +47,7 @@ namespace OOP_Assignment2
                     Output.InvalidCommand(input[0]); // An error message is diplayed.
                     break;
             }
-            Console.Write("Press any key to continue... ");
+            Output.Write("Press any key to continue... ");
             Console.ReadLine(); // The program waits until the user is ready to repeat.
             return true; // And the loop repeats.
         }
@@ -67,8 +67,13 @@ namespace OOP_Assignment2
             TextFile file2 = new TextFile(filename2);
             Console.ForegroundColor = ConsoleColor.White; // The text colour is set to white.
 
-            int lines = Max(file1.Count(), file2.Count()); // The number of lines in the longest text file.
-            for (int i = 0; i < lines; i++) // This iterates through each line of the files
+            string log_filename = $"{filename1}-{filename2}";
+
+            int lines;
+            if (file1.Count() >= file2.Count()) lines = file1.Count(); // The number of lines in the longest text file.
+            else lines = file2.Count();
+
+            for (int i = 0; i < lines; i++) // This iterates through each line of the files.
             {
                 bool condition = false;
                 try { if (file1[i] != file2[i]) condition = true; } // If the lines are different (and the end of the file has not been met),
@@ -78,8 +83,10 @@ namespace OOP_Assignment2
                     List<string> words1 = file1[i].Split(' ').ToList(); // Each line is split into words.
                     List<string> words2 = file2[i].Split(' ').ToList();
 
-                    Output.Write($"\n{i+1}", ConsoleColor.Green); // The line number is writen to the console (in green because the line is different)
-                    Output.Write($"| ");
+                    Output.LogAndWrite(log_filename, $"\n{i+1}", 'g');
+                    Output.LogAndWrite(log_filename, "| ");
+                    //Output.Write($"\n{i+1}", 'g'); // The line number is writen to the console (in green because the line is different)
+                    //Output.Write($"| ");
 
                     for(int j = 0; j < words1.Count(); j++) // For each word in the line,
                     {
@@ -87,39 +94,33 @@ namespace OOP_Assignment2
                         {
                             if (words1[j] == words2[j]) // If the words are the same in each file,
                             {
-                                Output.Write(words1[j]+" "); // It is written to the console in white.
+                                Output.LogAndWrite(log_filename, words1[j]+" ");
+                                //Output.Write(words1[j]+" "); // It is written to the console in white.
                             }
                             else
                             {
-                                Output.Write(words1[j]+" ", ConsoleColor.Green); // Otherwise, it's written in green.
+                                //Output.Write(words1[j]+" ", 'g'); // Otherwise, it's written in green.
+                                Output.LogAndWrite(log_filename, words1[j]+" ", 'g');
                             }
                         }
-                        catch (ArgumentOutOfRangeException) // But if the 
-                        {
-                            //if (words1.Count > j) Output.Write(words1[j]+" ", ConsoleColor.Green);
-                            //else Output.Write(words2[j]+" ", ConsoleColor.Green);
-                        }
+                        catch (ArgumentOutOfRangeException) {}
                     }
                 }
-                else 
+                else // If the lines are the same,
                 {
-                    try { Output.Write($"\n{i+1}| {file1[i]}"); } catch (ArgumentOutOfRangeException) {} 
+                    //try { Output.Write($"\n{i+1}| {file1[i]}"); } catch (ArgumentOutOfRangeException) {} // It is written to the console in white.
+                    try { Output.LogAndWrite(log_filename, $"\n{i+1}| {file1[i]}"); } catch (ArgumentOutOfRangeException) {} // It is written to the console in white.
                 }
             }
-            Console.Write("\n");
-        }
-
-        static int Max(int value1, int value2)
-        {
-            if (value1 >= value2) return value1;
-            else return value2;
+            //Console.Write("\n"); // Then a new line character is written.
+            Output.LogAndWrite(log_filename, "\n");
         }
     }
 
     class TextFile : List<string>
     {
         ///<summary>
-        ///This loads a text file into the list 'contents'.
+        ///This loads a text file into the base.
         ///</summary>
         ///<param name="filename">
         ///The name of the text file to be loaded.
@@ -139,26 +140,74 @@ namespace OOP_Assignment2
 
     class Output
     {
+        ///<summary>
+        ///Displays an appropriate error to the console.
+        ///</summary>
+        ///<param name="filename">
+        ///The name of the file which could not be found.
+        ///</param>
         public static void FileNotFound(string filename)
         {
             Console.WriteLine($"Error: {filename} not found.");
         }
 
+        ///<summary>
+        ///Displays an appropriate error to the console.
+        ///</summary>
+        ///<param name="command">
+        ///The input which couldn't be understood.
+        ///</param>
         public static void InvalidCommand(string command)
         {
             Console.WriteLine($"Error: Command Not Recognised: {command}");
         }
 
+        ///<summary>
+        ///Displays an appropriate error to the console.
+        ///</summary>
+        ///<param name="command">
+        ///The command the user entered.
+        ///</param>
+        ///<param name="arguments_given">
+        ///The number of arguments the user gave.
+        ///</param>
+        ///<param name="arguments_expected">
+        ///The number of arguments this command expected.
+        ///</param>
         public static void InvalidArguments(string command, int arguments_given, int arguments_expected)
         {
             Console.WriteLine($"Error: '{command}' expects {arguments_expected} arguments, but {arguments_given} are given.");
         }
 
-        public static void Write(string str, ConsoleColor color=ConsoleColor.White)
+        ///<summary>
+        ///Writes text to the console.
+        ///</summary>
+        ///<param name="str">
+        ///The text to be written to the console.
+        ///</param>
+        ///<param name="color">
+        ///The colour the text will be written in.
+        ///</param>
+        public static void Write(string str, char c='w')
         {
-            Console.ForegroundColor = color;
+            ConsoleColor colour;
+            if (c == 'w') colour = ConsoleColor.White;
+            else colour = ConsoleColor.Green;
+            Console.ForegroundColor = colour;
             Console.Write(str);
             Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static void Log(string filename, string text, char colour='w')
+        {
+            if (colour == 'w') System.IO.File.AppendAllText($"Logs/{filename}", text);
+            else System.IO.File.AppendAllText($"Logs/{filename}", $"<{colour}>{text}</{colour}>");
+        }
+
+        public static void LogAndWrite(string filename, string text, char colour='w')
+        {
+            Write(text, colour);
+            Log(filename, text, colour);
         }
     }
 }
