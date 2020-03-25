@@ -127,9 +127,9 @@ namespace OOP_Assignment2
         ///</param>
         public TextFile(string filename)
         {
-            if (System.IO.File.Exists($"Files/{filename}")) // If the file the user selected exists,
+            if (System.IO.File.Exists($"{filename}")) // If the file the user selected exists,
             {
-                base.AddRange(System.IO.File.ReadAllLines($"Files/{filename}").ToList()); // Read the files contents and add to this file.
+                base.AddRange(System.IO.File.ReadAllLines($"{filename}").ToList()); // Read the files contents and add to this file.
             }
             else // Otherwise,
             {
@@ -210,9 +210,9 @@ namespace OOP_Assignment2
         ///</param>
         private static void Log(string filename, string text, bool modified=false)
         {
-            if (!System.IO.File.Exists($"Logs/{filename}")) System.IO.File.AppendAllText($"Logs/{filename}", "//If a word has been modified, it is followed by an asterix.\n"); // If the file has just been created, add a comment to the top.
-            if (!modified) System.IO.File.AppendAllText($"Logs/{filename}", text); // If the text being added has not been modified, it is logged without an asterix, 
-            else System.IO.File.AppendAllText($"Logs/{filename}", $"{text}* "); // Otherwise, it is logged with an asterix.
+            if (!System.IO.File.Exists($"{filename}")) System.IO.File.AppendAllText($"{filename}", "//If a word has been modified, it is followed by an asterix.\n"); // If the file has just been created, add a comment to the top.
+            if (!modified) System.IO.File.AppendAllText($"{filename}", text); // If the text being added has not been modified, it is logged without an asterix, 
+            else System.IO.File.AppendAllText($"{filename}", $"{text}* "); // Otherwise, it is logged with an asterix.
         }
 
         ///<summary>
