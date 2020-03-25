@@ -13,7 +13,6 @@ namespace OOP_Assignment2
         ///</summary>
         static void Main(string[] args)
         {
-            Console.Clear();
             while(Loop()) {} // The core loop.
         }
 
@@ -25,6 +24,7 @@ namespace OOP_Assignment2
         ///</returns>
         static bool Loop()
         {
+            Console.Clear();
             Console.WriteLine("*OOP Assignment 2*\n"); // The program title is printed to the console.
             Console.Write(">>");
             string[] input = Console.ReadLine().Split(' '); // The user is asked for an input.
@@ -32,7 +32,7 @@ namespace OOP_Assignment2
             switch (input[0])
             {
                 case "diff": // If the user wants to use the 'diff' command,
-                    if (input.Count() == 3) Diff2(input[1], input[2]); // If the user provided the correct amount of parameters, the diff method is called.
+                    if (input.Count() == 3) Diff(input[1], input[2]); // If the user provided the correct amount of parameters, the diff method is called.
                     else Output.InvalidArguments("diff", input.Count()-1, 2); // If the user did not provide the correct amount of parameters, an error is displayed.
                     break;
                 case "help": // If the user wants to use the 'help' command,
@@ -49,106 +49,55 @@ namespace OOP_Assignment2
             }
             Console.Write("Press any key to continue... ");
             Console.ReadLine(); // The program waits until the user is ready to repeat.
-            Console.Clear(); // Then the console is cleared,
             return true; // And the loop repeats.
         }
 
         ///<summary>
-        ///This method compares two strings.
+        ///This method compares two strings and displays the differences to the console. 
         ///</summary>
-        ///<param name="string1">
-        ///The first string to be compared.
+        ///<param name="filename1">
+        ///The first file to be compared.
         ///</param>
-        ///<param name="string2">
-        ///The second string to be compared.
+        ///<param name="filename2">
+        ///The second file to be compared.
         ///</param>
-        ///<returns>
-        ///Returns true if the strings are identical. Otherwise, returns false.
-        ///</returns>
         static void Diff(string filename1, string filename2)
         {
-            TextFile file1 = new TextFile(filename1);
+            TextFile file1 = new TextFile(filename1); // The files are loaded.
             TextFile file2 = new TextFile(filename2);
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.White; // The text colour is set to white.
 
-            int lines = Max(file1.Count(), file2.Count());
-            int chars;
-            for (int i = 0; i < lines; i++)
-            {
-                chars = Max(file1[i].Count(), file2[i].Count());
-                //Console.WriteLine($"\nThe longest line is {chars} characters long.");
-                if (file1[i] != file2[i])
-                {   
-                    Output.Write($"\n{i+1}", ConsoleColor.Green);
-                    Output.Write("| ", ConsoleColor.White);
-                    for (int j = 0; j < chars; j++)
-                    {
-                        try
-                        {
-                            if (file1[i][j] != file2[i][j]) Output.Write(file1[i][j].ToString(), ConsoleColor.Green);
-                            else Output.Write(file1[i][j].ToString(), ConsoleColor.White);
-                        }
-                        catch (IndexOutOfRangeException) 
-                        { 
-                            //try { Output.Write(file2[i][j].ToString(), ConsoleColor.Red); }
-                            //catch (IndexOutOfRangeException) {}
-                        }
-                    }
-                }
-                else 
-                {
-                    Output.Write($"\n{i+1}| ", ConsoleColor.White);
-                    Output.Write(file1[i], ConsoleColor.White);
-                }
-            }
-            Console.Write("\n");
-        }
-
-        static void Diff2(string filename1, string filename2)
-        {
-            TextFile file1 = new TextFile(filename1);
-            TextFile file2 = new TextFile(filename2);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            int lines = Max(file1.Count(), file2.Count());
-            int words;
-            for (int i = 0; i < lines; i++)
+            int lines = Max(file1.Count(), file2.Count()); // The number of lines in the longest text file.
+            for (int i = 0; i < lines; i++) // This iterates through each line of the files
             {
                 bool condition = false;
-                try
-                {
-                    if (file1[i] != file2[i]) condition = true;
-                }
+                try { if (file1[i] != file2[i]) condition = true; } // If the lines are different (and the end of the file has not been met),
                 catch (ArgumentOutOfRangeException) {}
-
                 if (condition)
                 {   
-                    List<string> words1 = file1[i].Split(' ').ToList();
+                    List<string> words1 = file1[i].Split(' ').ToList(); // Each line is split into words.
                     List<string> words2 = file2[i].Split(' ').ToList();
 
-                    //words = Max(words1.Count(), words2.Count());
-                    words = words1.Count();
-
-                    Output.Write($"\n{i+1}", ConsoleColor.Green);
+                    Output.Write($"\n{i+1}", ConsoleColor.Green); // The line number is writen to the console (in green because the line is different)
                     Output.Write($"| ");
 
-                    for(int j = 0; j < words; j++)
+                    for(int j = 0; j < words1.Count(); j++) // For each word in the line,
                     {
                         try
                         {
-                            if (words1[j] == words2[j])
+                            if (words1[j] == words2[j]) // If the words are the same in each file,
                             {
-                                Output.Write(words1[j]+" ");
+                                Output.Write(words1[j]+" "); // It is written to the console in white.
                             }
                             else
                             {
-                                Output.Write(words1[j]+" ", ConsoleColor.Green);
+                                Output.Write(words1[j]+" ", ConsoleColor.Green); // Otherwise, it's written in green.
                             }
                         }
-                        catch (ArgumentOutOfRangeException)
+                        catch (ArgumentOutOfRangeException) // But if the 
                         {
-                            if (words1.Count > j) Output.Write(words1[j]+" ", ConsoleColor.Green);
-                            else Output.Write(words2[j]+" ", ConsoleColor.Green);
+                            //if (words1.Count > j) Output.Write(words1[j]+" ", ConsoleColor.Green);
+                            //else Output.Write(words2[j]+" ", ConsoleColor.Green);
                         }
                     }
                 }
