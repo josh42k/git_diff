@@ -47,7 +47,7 @@ namespace OOP_Assignment2
                     Output.InvalidCommand(input[0]); // An error message is diplayed.
                     break;
             }
-            Output.Write("Press any key to continue... ");
+            Output.LogAndWrite("", "Press any key to continue... ", false, "write");
             Console.ReadLine(); // The program waits until the user is ready to repeat.
             return true; // And the loop repeats.
         }
@@ -83,10 +83,8 @@ namespace OOP_Assignment2
                     List<string> words1 = file1[i].Split(' ').ToList(); // Each line is split into words.
                     List<string> words2 = file2[i].Split(' ').ToList();
 
-                    Output.LogAndWrite(log_filename, $"\n{i+1}", 'g');
+                    Output.LogAndWrite(log_filename, $"\n{i+1}", true);
                     Output.LogAndWrite(log_filename, "| ");
-                    //Output.Write($"\n{i+1}", 'g'); // The line number is writen to the console (in green because the line is different)
-                    //Output.Write($"| ");
 
                     for(int j = 0; j < words1.Count(); j++) // For each word in the line,
                     {
@@ -94,13 +92,12 @@ namespace OOP_Assignment2
                         {
                             if (words1[j] == words2[j]) // If the words are the same in each file,
                             {
-                                Output.LogAndWrite(log_filename, words1[j]+" ");
-                                //Output.Write(words1[j]+" "); // It is written to the console in white.
+                                Output.LogAndWrite(log_filename, words1[j]+" "); // It is written & logged in white.
                             }
                             else
                             {
-                                //Output.Write(words1[j]+" ", 'g'); // Otherwise, it's written in green.
-                                Output.LogAndWrite(log_filename, words1[j]+" ", 'g');
+                                Output.LogAndWrite(log_filename, words1[j], true); // Otherwise, it's done in green.
+                                Output.LogAndWrite("", " ", false, "write"); // This is written for formatting.
                             }
                         }
                         catch (ArgumentOutOfRangeException) {}
@@ -108,12 +105,15 @@ namespace OOP_Assignment2
                 }
                 else // If the lines are the same,
                 {
-                    //try { Output.Write($"\n{i+1}| {file1[i]}"); } catch (ArgumentOutOfRangeException) {} // It is written to the console in white.
-                    try { Output.LogAndWrite(log_filename, $"\n{i+1}| {file1[i]}"); } catch (ArgumentOutOfRangeException) {} // It is written to the console in white.
+                    try
+                    {
+                        Output.LogAndWrite(log_filename, $"\n{i+1}"); // It is written to the console in white (and logged)
+                        Output.LogAndWrite(log_filename, "  ", false, "log");
+                        Output.LogAndWrite(log_filename, $"| {file1[i]}");
+                    } catch (ArgumentOutOfRangeException) {} 
                 }
             }
-            //Console.Write("\n"); // Then a new line character is written.
-            Output.LogAndWrite(log_filename, "\n");
+            Output.LogAndWrite(log_filename, "\n"); // Then a new line character is written.
         }
     }
 
@@ -148,7 +148,7 @@ namespace OOP_Assignment2
         ///</param>
         public static void FileNotFound(string filename)
         {
-            Console.WriteLine($"Error: {filename} not found.");
+            Console.WriteLine($"Error: {filename} not found."); // Error is written.
         }
 
         ///<summary>
@@ -159,7 +159,7 @@ namespace OOP_Assignment2
         ///</param>
         public static void InvalidCommand(string command)
         {
-            Console.WriteLine($"Error: Command Not Recognised: {command}");
+            Console.WriteLine($"Error: Command Not Recognised: {command}"); // Error is written.
         }
 
         ///<summary>
@@ -176,7 +176,7 @@ namespace OOP_Assignment2
         ///</param>
         public static void InvalidArguments(string command, int arguments_given, int arguments_expected)
         {
-            Console.WriteLine($"Error: '{command}' expects {arguments_expected} arguments, but {arguments_given} are given.");
+            Console.WriteLine($"Error: '{command}' expects {arguments_expected} arguments, but {arguments_given} are given."); // Error is written.
         }
 
         ///<summary>
@@ -185,29 +185,52 @@ namespace OOP_Assignment2
         ///<param name="str">
         ///The text to be written to the console.
         ///</param>
-        ///<param name="color">
-        ///The colour the text will be written in.
+        ///<param name="modified">
+        ///Whether or not the word has been modified
         ///</param>
-        public static void Write(string str, char c='w')
+        private static void Write(string str, bool modified=false)
         {
-            ConsoleColor colour;
-            if (c == 'w') colour = ConsoleColor.White;
-            else colour = ConsoleColor.Green;
-            Console.ForegroundColor = colour;
-            Console.Write(str);
-            Console.ForegroundColor = ConsoleColor.White;
+            if (!modified) Console.ForegroundColor = ConsoleColor.White; 
+            else Console.ForegroundColor = ConsoleColor.Green; // The colour is set to green if the text has been modified.
+            Console.Write(str); // The text is written.
+            Console.ForegroundColor = ConsoleColor.White; // The colour is reset.
         }
 
-        public static void Log(string filename, string text, char colour='w')
+        ///<summary>
+        ///Writes text to a log file.
+        ///</summary>
+        ///<param name="filename">
+        ///The name of the file to be logged to.
+        ///</param>
+        ///<param name="text">
+        ///The text to be written to the log file.
+        ///</param>
+        ///<param name="modified">
+        ///Whether or not the word has been modified
+        ///</param>
+        private static void Log(string filename, string text, bool modified=false)
         {
-            if (colour == 'w') System.IO.File.AppendAllText($"Logs/{filename}", text);
-            else System.IO.File.AppendAllText($"Logs/{filename}", $"<{colour}>{text}</{colour}>");
+            if (!System.IO.File.Exists($"Logs/{filename}")) System.IO.File.AppendAllText($"Logs/{filename}", "//If a word has been modified, it is followed by an asterix.\n"); // If the file has just been created, add a comment to the top.
+            if (!modified) System.IO.File.AppendAllText($"Logs/{filename}", text); // If the text being added has not been modified, it is logged without an asterix, 
+            else System.IO.File.AppendAllText($"Logs/{filename}", $"{text}* "); // Otherwise, it is logged with an asterix.
         }
 
-        public static void LogAndWrite(string filename, string text, char colour='w')
+        ///<summary>
+        ///Writes text to a log file and the console.
+        ///</summary>
+        ///<param name="filename">
+        ///The name of the file to be logged to.
+        ///</param>
+        ///<param name="text">
+        ///The text to be written to the log file and the console.
+        ///</param>
+        ///<param name="modified">
+        ///Whether or not the word has been modified
+        ///</param>
+        public static void LogAndWrite(string filename, string text, bool modified=false, string mode="both")
         {
-            Write(text, colour);
-            Log(filename, text, colour);
+            if (mode == "both" || mode == "write") Write(text, modified); // The text is written to the console.
+            if (mode == "both" || mode == "log") Log(filename, text, modified); // The text is logged to the file.
         }
     }
 }
