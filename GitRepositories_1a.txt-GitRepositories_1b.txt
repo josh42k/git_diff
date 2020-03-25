@@ -1,2 +1,0 @@
-//If a word has been modified, it is followed by an asterix.
-
